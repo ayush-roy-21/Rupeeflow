@@ -1,0 +1,48 @@
+{
+  "name": "rupeeflow-smart-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for RupeeFlow cross-border remittance platform",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network mumbai",
+    "deploy:amoy": "hardhat run scripts/deploy.js --network amoy",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "verify:testnet": "hardhat verify --network mumbai",
+    "verify:amoy": "hardhat verify --network amoy",
+    "node": "hardhat node",
+    "clean": "hardhat clean"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "polygon",
+    "remittance",
+    "defi",
+    "solidity"
+  ],
+  "author": "RupeeFlow Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
+    "@nomicfoundation/hardhat-ethers": "^3.0.4",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.1",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "chai": "^4.3.7",
+    "ethers": "^6.8.1",
+    "hardhat": "^2.19.1",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.5",
+    "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.6",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "dotenv": "^17.2.1"
+  }
+}
