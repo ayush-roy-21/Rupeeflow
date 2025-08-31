@@ -2,10 +2,9 @@
   "name": "frontend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview" 
   },
   "devDependencies": {
     "eslint": "^8.0.0",
