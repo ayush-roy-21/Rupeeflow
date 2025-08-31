@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: rupeeflow-postgres
+    environment:
+      POSTGRES_DB: rupeeflow
+      POSTGRES_USER: rupeeflow
+      POSTGRES_PASSWORD: rupeeflow123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rupeeflow-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: rupeeflow-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rupeeflow-network
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: rupeeflow-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@rupeeflow.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    networks:
+      - rupeeflow-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  rupeeflow-network:
+    driver: bridge
