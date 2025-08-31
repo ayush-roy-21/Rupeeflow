@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  password          String
+  firstName         String
+  lastName          String
+  phone             String
+  dateOfBirth       DateTime
+  nationality       String   @db.Char(2)
+  kycStatus         KYCStatus @default(PENDING)
+  role              UserRole @default(USER)
+  isActive          Boolean  @default(true)
+  isEmailVerified   Boolean  @default(false)
+  tokenVersion      Int      @default(0)
+  lastLoginAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  address           Address?
+  kycApplications   KYCApplication[]
+  transfers         Transfer[]
+  emailVerifications EmailVerification[]
+  passwordResets    PasswordReset[]
+
+  @@map("users")
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  street      String
+  city        String
+  state       String
+  postalCode  String
+  country     String   @db.Char(2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+model KYCApplication {
+  id                    String      @id @default(uuid())
+  userId                String
+  status                KYCStatus
+  step                  KYCStep
+  startedAt             DateTime
+  submittedAt           DateTime?
+  estimatedCompletionTime DateTime?
+  completedAt           DateTime?
+  rejectionReason       String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  // Relations
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents             KYCDocument[]
+
+  @@map("kyc_applications")
+}
+
+model KYCDocument {
+  id                  String        @id @default(uuid())
+  kycApplicationId    String
+  documentType        DocumentType
+  documentNumber      String
+  expiryDate          DateTime?
+  issuingCountry      String        @db.Char(2)
+  status              DocumentStatus @default(PENDING_VERIFICATION)
+  uploadedAt          DateTime      @default(now())
+  verifiedAt          DateTime?
+  rejectionReason     String?
+  fileUrl             String?
+
+  // Relations
+  kycApplication      KYCApplication @relation(fields: [kycApplicationId], references: [id], onDelete: Cascade)
+
+  @@map("kyc_documents")
+}
+
+model Transfer {
+  id                      String          @id @default(uuid())
+  userId                  String
+  sourceAmount            Decimal         @db.Decimal(20, 2)
+  sourceCurrency          String          @db.Char(3)
+  destinationCurrency     String          @db.Char(3)
+  recipientName           String
+  recipientPhone          String
+  recipientEmail          String?
+  purpose                 TransferPurpose
+  sourceCountry           String          @db.Char(2)
+  destinationCountry      String          @db.Char(2)
+  status                  TransferStatus  @default(PENDING)
+  exchangeRate            Decimal         @db.Decimal(20, 8)
+  fees                    Decimal         @db.Decimal(20, 2)
+  blockchainTxHash        String?
+  estimatedCompletionTime DateTime?
+  completedAt             DateTime?
+  cancelledAt             DateTime?
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+
+  // Relations
+  user                    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transfers")
+}
+
+model EmailVerification {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_verifications")
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_resets")
+}
+
+// Enums
+enum KYCStatus {
+  PENDING
+  IN_REVIEW
+  VERIFIED
+  REJECTED
+  REQUIRES_ADDITIONAL_INFO
+}
+
+enum KYCStep {
+  NOT_STARTED
+  DOCUMENT_UPLOAD
+  VERIFICATION_IN_PROGRESS
+  COMPLETED
+}
+
+enum DocumentType {
+  PASSPORT
+  AADHAAR
+  DRIVING_LICENSE
+  ADDRESS_PROOF
+}
+
+enum DocumentStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
+}
+
+enum TransferStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum TransferPurpose {
+  FAMILY_SUPPORT
+  EDUCATION
+  BUSINESS
+  INVESTMENT
+  OTHER
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  COMPLIANCE_OFFICER
+  OPERATOR
+}
