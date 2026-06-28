@@ -48,7 +48,7 @@ The protocol features a **trustless multi-signature escrow mechanism** built wit
 ## Features
 
 ### 🏗️ Core Protocol
-- **Remittance Router** — Orchestrates cross-border payment flows with corridor-specific configuration (fee tiers, limits, compliance rules)
+- **Remittance Router** -- Orchestrates cross-border payment flows with corridor-specific configuration (fee tiers, limits, compliance rules)
 - **Multi-Signature Escrow** — Trustless fund custody using OpenZeppelin's multi-sig patterns; funds are held in escrow until delivery confirmation
 - **CBDC Settlement** — Multi-CBDC support (Digital Rupee, Digital Dollar, Digital Yuan, etc.) for sovereign-backed stable-value transfers with zero slippage
 - **Fee Controller** — Dynamic fee calculation engine with tiered pricing, volume discounts, and corridor-specific overrides
