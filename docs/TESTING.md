@@ -25,7 +25,7 @@ RupeeFlow follows a **multi-layered testing strategy** designed to achieve **95%
 
 - **Unit Tests** — Individual function correctness
 - **Integration Tests** — Multi-contract interaction flows
-- **Fork Tests** — Real USDC on forked Base mainnet
+- **Fork Tests** — Real CBDC tokens on forked Base mainnet
 - **Invariant/Fuzz Tests** — Property-based testing with random inputs
 
 ---
@@ -35,7 +35,7 @@ RupeeFlow follows a **multi-layered testing strategy** designed to achieve **95%
 ```
                     ┌───────────────┐
                     │   Fork Tests  │    ~15 tests
-                    │  (Mainnet)    │    Real USDC, real Base state
+                    │  (Mainnet)    │    Real CBDC, real Base state
                     ├───────────────┤
                     │  Invariant /  │    ~10 tests
                     │  Fuzz Tests   │    Property-based, random inputs
@@ -91,7 +91,7 @@ function test_initiateTransfer_revertsOnInactiveCorridor() public { ... }
 // Test: Reverts when paused
 function test_initiateTransfer_revertsWhenPaused() public { ... }
 
-// Test: Reverts with insufficient USDC allowance
+// Test: Reverts with insufficient CBDC allowance
 function test_initiateTransfer_revertsOnInsufficientAllowance() public { ... }
 
 // Test: Transfer completion with valid multi-sig
@@ -123,7 +123,7 @@ function test_events_transferCompleted() public { ... }
 ### `test/unit/MultiSigEscrow.t.sol`
 
 ```solidity
-// Test: Deposit USDC into escrow
+// Test: Deposit CBDC into escrow
 function test_deposit_success() public { ... }
 
 // Test: Release with valid 2-of-3 signatures
@@ -287,7 +287,7 @@ function test_multisig_signatureIsolation() public { ... }
 
 ## Fork Tests
 
-Fork tests run against a **live fork of Base mainnet** to validate real USDC interactions.
+Fork tests run against a **live fork of Base mainnet** to validate real CBDC token interactions.
 
 ### `test/fork/BaseFork.t.sol`
 
@@ -301,24 +301,24 @@ abstract contract BaseForkTest is Test {
         baseFork = vm.createFork(vm.envString("BASE_RPC_URL"));
         vm.selectFork(baseFork);
 
-        // USDC on Base
+        // CBDC token on Base
         usdc = IERC20(0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913);
     }
 
-    /// @dev Deal USDC to an address using storage manipulation
-    function _dealUSDC(address to, uint256 amount) internal {
+    /// @dev Deal CBDC to an address using storage manipulation
+    function _dealCBDC(address to, uint256 amount) internal {
         deal(address(usdc), to, amount);
     }
 }
 ```
 
-### `test/fork/USDCFork.t.sol`
+### `test/fork/CBDCFork.t.sol`
 
 ```solidity
-// Test: Real USDC transfer through escrow on forked Base
-function test_fork_realUSDCTransfer() public {
-    // 1. Deal USDC to sender
-    _dealUSDC(sender, 1000e6); // 1000 USDC
+// Test: Real CBDC transfer through escrow on forked Base
+function test_fork_realCBDCTransfer() public {
+    // 1. Deal CBDC to sender
+    _dealCBDC(sender, 1000e6); // 1000 CBDC tokens
 
     // 2. Approve Router
     vm.prank(sender);
@@ -330,24 +330,24 @@ function test_fork_realUSDCTransfer() public {
         recipient, 1000e6, corridorId, ""
     );
 
-    // 4. Verify escrow holds USDC
+    // 4. Verify escrow holds CBDC
     assertEq(usdc.balanceOf(address(escrow)), netAmount);
 
     // 5. Complete with multi-sig
     bytes[] memory sigs = _signRelease(txId, recipient, netAmount);
     router.completeTransfer(txId, sigs);
 
-    // 6. Verify recipient received USDC
+    // 6. Verify recipient received CBDC
     assertEq(usdc.balanceOf(recipient), netAmount);
 }
 
-// Test: USDC approval edge cases on forked state
+// Test: CBDC approval edge cases on forked state
 function test_fork_usdcApprovalEdgeCases() public { ... }
 
 // Test: Large transfer on forked Base
 function test_fork_largeTransfer() public { ... }
 
-// Test: Multiple transfers consuming real USDC on fork
+// Test: Multiple transfers consuming real CBDC on fork
 function test_fork_multipleTransfers() public { ... }
 
 // Test: Gas consumption on actual Base fork
@@ -363,7 +363,7 @@ Stateful fuzz tests that verify protocol invariants hold across random transacti
 ### `test/invariant/EscrowInvariant.t.sol`
 
 ```solidity
-/// @notice Invariant: Escrow USDC balance >= sum of all active deposits
+/// @notice Invariant: Escrow CBDC balance >= sum of all active deposits
 function invariant_escrowBalanceCoversDeposits() public {
     uint256 totalDeposited = escrowHandler.ghost_totalDeposited()
                            - escrowHandler.ghost_totalReleased()

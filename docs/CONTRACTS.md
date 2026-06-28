@@ -42,7 +42,7 @@ RemittanceRouter
 ├── uses: IMultiSigEscrow (MultiSigEscrow)
 ├── uses: IFeeController (FeeController)
 ├── uses: IAMLModule (AMLModule)
-├── uses: IERC20 (USDC)
+├── uses: IERC20 (CBDC)
 ├── uses: TransferLib
 └── uses: CorridorLib
 
@@ -50,7 +50,7 @@ MultiSigEscrow
 ├── inherits: ReentrancyGuard, AccessControl
 ├── uses: ECDSA, EIP712
 ├── uses: SafeERC20
-└── uses: IERC20 (USDC)
+└── uses: IERC20 (CBDC)
 
 FeeController
 ├── inherits: AccessControl
@@ -169,7 +169,7 @@ enum TransferStatus {
 ```solidity
 /// @notice Initiates a new cross-border transfer
 /// @param recipient The recipient wallet address
-/// @param amount The gross USDC amount (6 decimals)
+/// @param amount The gross CBDC amount (token decimals vary by CBDC)
 /// @param corridorId The corridor identifier (e.g., keccak256("US-IN"))
 /// @param metadata Arbitrary encoded metadata
 /// @return transferId The unique transfer identifier
@@ -219,7 +219,7 @@ function getTransfer(bytes32 transferId) external view returns (Transfer memory)
 
 ### `MultiSigEscrow.sol`
 
-**Purpose**: Trustless USDC custody with multi-signature release authorization.
+**Purpose**: Trustless CBDC custody with multi-signature release authorization.
 
 **Inheritance**: `ReentrancyGuard`, `AccessControl`, `EIP712`
 
@@ -260,7 +260,7 @@ enum EscrowStatus {
 #### Functions
 
 ```solidity
-/// @notice Deposits USDC into escrow for a transfer
+/// @notice Deposits CBDC tokens into escrow for a transfer
 /// @dev Only callable by the RemittanceRouter
 function deposit(
     bytes32 transferId,
@@ -475,7 +475,7 @@ struct Corridor {
     string sourceCountry;        // ISO 3166-1 alpha-2
     string destCountry;
     bool active;
-    uint256 minAmount;           // Minimum transfer (USDC, 6 decimals)
+    uint256 minAmount;           // Minimum transfer (CBDC, token decimals)
     uint256 maxAmount;           // Maximum transfer
     uint256 dailyLimit;          // Daily aggregate limit per corridor
     uint256 reportingThreshold;  // AML reporting threshold
@@ -650,7 +650,7 @@ error TransferNotFound();              // Transfer ID doesn't exist
 error InvalidTransferStatus();         // Wrong status for this operation
 error UnauthorizedCaller();            // Caller not authorized
 error TransferNotExpired();            // Cannot refund before expiry
-error InsufficientAllowance();         // USDC allowance too low
+error InsufficientAllowance();         // CBDC allowance too low
 
 // Escrow errors
 error InsufficientSignatures();        // Below threshold

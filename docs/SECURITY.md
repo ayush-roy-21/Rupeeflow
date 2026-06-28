@@ -37,7 +37,7 @@ RupeeFlow follows a **defense-in-depth** approach with multiple overlapping secu
 
 | Asset | Description | Priority |
 |-------|-------------|----------|
-| Escrowed USDC | User funds held in MultiSigEscrow | **Critical** |
+| Escrowed CBDCs | User funds held in MultiSigEscrow | **Critical** |
 | Protocol Fees | Accumulated fee revenue | **High** |
 | Access Control State | Role assignments and permissions | **High** |
 | AML Data | Wallet cluster data and risk scores | **Medium** |
@@ -59,7 +59,7 @@ RupeeFlow follows a **defense-in-depth** approach with multiple overlapping secu
 ### Threat Scenarios
 
 #### T1: Escrow Fund Theft
-**Threat**: Attacker drains USDC from escrow contract.
+**Threat**: Attacker drains CBDC tokens from escrow contract.
 **Mitigations**:
 - Multi-sig requires M-of-N valid signatures to release
 - `ReentrancyGuard` prevents re-entrancy attacks
@@ -83,19 +83,19 @@ RupeeFlow follows a **defense-in-depth** approach with multiple overlapping secu
 - Signer set changes emit events for monitoring
 
 #### T4: Re-Entrancy Attack
-**Threat**: Malicious contract re-enters during USDC transfer.
+**Threat**: Malicious contract re-enters during CBDC transfer.
 **Mitigations**:
 - `ReentrancyGuard` on all state-changing functions
 - Checks-Effects-Interactions pattern throughout
 - `SafeERC20` for all token transfers
-- USDC itself is non-reentrant (standard ERC-20)
+- CBDC tokens follow standard ERC-20 (non-reentrant)
 
 #### T5: Front-Running / MEV
 **Threat**: MEV bot front-runs transfer initiation or completion.
 **Mitigations**:
 - Transfer initiation uses `msg.sender` as the depositor (can't be spoofed)
 - Completion requires valid multi-sig signatures (can't be front-run)
-- No price-sensitive operations (USDC is stable, no swap)
+- No price-sensitive operations (CBDCs are pegged to fiat, no swap)
 - Low MEV surface due to fixed-value stablecoin transfers
 
 #### T6: AML Bypass
@@ -222,7 +222,7 @@ SIGNER_ROLE (escrow)
 - **Implementation**: OpenZeppelin's `AccessControl`
 
 ### 8. Safe Token Transfers
-- **What**: `SafeERC20` wrappers for all USDC operations
+- **What**: `SafeERC20` wrappers for all CBDC token operations
 - **Why**: Handles non-standard ERC-20 return values safely
 - **Implementation**: OpenZeppelin's `SafeERC20`
 
@@ -304,7 +304,7 @@ All primitives are from **OpenZeppelin Contracts v5.x**, the latest audited rele
 
 - [ ] 95%+ test coverage with `forge coverage`
 - [ ] All invariant tests passing
-- [ ] Mainnet fork tests with real USDC
+- [ ] Mainnet fork tests with real CBDC tokens
 - [ ] Slither static analysis — zero high/medium findings
 - [ ] Mythril symbolic execution — zero critical findings
 - [ ] Gas optimization review

@@ -175,7 +175,7 @@ VelocityScore = min(100, (txCount_24h / maxTx_24h) × 50 + (volume_24h / maxVol_
 Where:
   txCount_24h   = Number of transfers in last 24 hours
   maxTx_24h     = Corridor-specific maximum expected transactions (default: 10)
-  volume_24h    = Total USDC volume in last 24 hours  
+  volume_24h    = Total CBDC volume in last 24 hours  
   maxVol_24h    = Corridor-specific maximum expected volume (default: $50,000)
 ```
 
@@ -393,7 +393,7 @@ All parameters are configurable by the `DEFAULT_ADMIN_ROLE`:
 | `amountWeight` | 10 | 0–100 | Weight of amount score in aggregate |
 | `sanctionsWeight` | 40 | 0–100 | Weight of sanctions score in aggregate |
 | `maxTx24h` | 10 | 1–1000 | Maximum expected transactions per 24h |
-| `maxVolume24h` | 50000e6 | 1–∞ | Maximum expected volume per 24h (USDC) |
+| `maxVolume24h` | 50000e6 | 1–∞ | Maximum expected volume per 24h (CBDC) |
 | `structuringWindow` | 48 hours | 1h–7d | Time window for structuring detection |
 | `defaultClusterRisk` | 85 | 1–100 | Default risk level for newly flagged clusters |
 

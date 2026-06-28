@@ -39,7 +39,7 @@ function initiateTransfer(
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `recipient` | `address` | Recipient wallet address |
-| `amount` | `uint256` | Gross USDC amount (6 decimals, e.g., `1000000` = 1 USDC) |
+| `amount` | `uint256` | Gross CBDC amount (token decimals, e.g., `1000000` = 1 CBDC with 6 decimals) |
 | `corridorId` | `bytes32` | Corridor identifier (e.g., `keccak256("US-IN")`) |
 | `metadata` | `bytes` | Arbitrary encoded metadata |
 
@@ -50,7 +50,7 @@ function initiateTransfer(
 - `amount >= corridor.minAmount`
 - `amount <= corridor.maxAmount`
 - Corridor must be active
-- Sender must have approved Router for `amount` USDC
+- Sender must have approved Router for `amount` CBDC tokens
 - AML screening must pass (not sanctioned)
 - Rate limit must not be exceeded
 
@@ -181,7 +181,7 @@ Returns the total number of transfers created.
 
 ## MultiSigEscrow
 
-> Trustless USDC custody with multi-signature release.
+> Trustless CBDC custody with multi-signature release.
 
 ### Write Functions
 
@@ -197,7 +197,7 @@ function deposit(
 ) external onlyRole(ROUTER_ROLE) nonReentrant
 ```
 
-Deposits USDC into escrow. Only callable by the RemittanceRouter.
+Deposits CBDC tokens into escrow. Only callable by the RemittanceRouter.
 
 ---
 
@@ -210,7 +210,7 @@ function release(
 ) external nonReentrant
 ```
 
-Releases escrowed USDC to the beneficiary with multi-sig authorization.
+Releases escrowed CBDC tokens to the beneficiary with multi-sig authorization.
 
 **Requirements**:
 - `signatures.length >= threshold`
@@ -225,7 +225,7 @@ Releases escrowed USDC to the beneficiary with multi-sig authorization.
 function refund(bytes32 transferId) external onlyRole(ROUTER_ROLE) nonReentrant
 ```
 
-Refunds escrowed USDC to the original depositor. Only callable by Router.
+Refunds escrowed CBDC tokens to the original depositor. Only callable by Router.
 
 ---
 

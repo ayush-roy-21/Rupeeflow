@@ -36,7 +36,7 @@ RupeeFlow is designed as a **modular, upgradeable protocol** consisting of three
 │     └──────────┴──────────────┴────────────────┘     │
 ├─────────────────────────────────────────────────────┤
 │                  SETTLEMENT LAYER                    │
-│          USDC (Circle) on Base L2 Network            │
+│       CBDCs (Central Bank Digital Currencies)         │
 ├─────────────────────────────────────────────────────┤
 │                  INFRASTRUCTURE LAYER                │
 │       Base L2 (Optimism Stack) → Ethereum L1         │
@@ -82,24 +82,32 @@ Multiple overlapping security mechanisms protect against different attack vector
 | Avg. Gas Price | ~0.01 gwei | ~30 gwei | **3000x cheaper** |
 | Block Time | 2 seconds | 12 seconds | **6x faster** |
 | Finality | ~2–10 seconds | ~15 minutes | **~90x faster** |
-| USDC Support | Native Circle USDC | Native | Both supported |
+| CBDC Support | ERC-20 CBDC tokens | Native | Both supported |
 | Security | Inherits from ETH L1 | L1 native | Both L1-secured |
 | Ecosystem | Coinbase-backed | Largest | Growing rapidly |
 
 Base (built on the Optimism stack) provides:
 - **Optimistic rollup security**: Transactions are batched and posted to Ethereum L1, inheriting its security guarantees
 - **EVM equivalence**: Identical smart contract deployment and tooling (Foundry, Hardhat, etc.)
-- **Native USDC**: Circle's official USDC deployment on Base (not a bridged token)
+- **CBDC Token Support**: ERC-20 compatible CBDC tokens (e-Rupee, e-Dollar, etc.) deployed on Base
 
-### Settlement Layer — USDC
+### Settlement Layer — CBDCs
 
-We use **Circle's native USDC on Base** (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`) as the settlement currency because:
+We use **Central Bank Digital Currencies (CBDCs)** as the settlement layer, supporting multiple sovereign digital currencies:
 
-1. **Price Stability** — 1:1 USD peg eliminates volatility risk during transfer
-2. **Regulatory Compliance** — Circle is a regulated entity with transparent reserves
-3. **Liquidity** — Deepest stablecoin liquidity across DeFi
-4. **No Bridge Risk** — Native deployment, not a bridged/wrapped token
-5. **Gasless Approvals** — Supports EIP-2612 `permit()` for meta-transactions
+1. **Sovereign Backing** — CBDCs are issued by central banks (RBI, Fed, PBoC), providing full government backing
+2. **Regulatory Compliance** — CBDCs are inherently compliant as they are issued by regulators themselves
+3. **Price Stability** — 1:1 peg to national fiat currency eliminates volatility risk
+4. **Multi-Currency Support** — Protocol supports multiple CBDC tokens per corridor (e-Rupee for India, e-Dollar for US, etc.)
+5. **ERC-20 Compatible** — CBDCs deployed as ERC-20 tokens on Base L2 for seamless DeFi composability
+
+**Supported CBDCs:**
+| CBDC | Issuer | Standard | Corridor Usage |
+|------|--------|----------|----------------|
+| e-Rupee (e₹) | Reserve Bank of India | ERC-20 | India corridors |
+| e-Dollar | Federal Reserve | ERC-20 | US corridors |
+| e-Yuan (e-CNY) | People's Bank of China | ERC-20 | China corridors |
+| e-Dirham | UAE Central Bank | ERC-20 | UAE corridors |
 
 ### Protocol Layer — Smart Contracts
 
@@ -265,7 +273,7 @@ The escrow uses an **off-chain signature collection** model (similar to Gnosis S
 | `ReentrancyGuard` | Protection against re-entrancy attacks |
 | `Pausable` | Emergency stop mechanism |
 | `AccessControl` | Role-based permissions (SIGNER_ROLE, ADMIN_ROLE) |
-| `SafeERC20` | Safe USDC transfer handling |
+| `SafeERC20` | Safe CBDC token transfer handling |
 
 ---
 
@@ -347,7 +355,7 @@ src/
 │   │   └── NetworkSwitcher.tsx      # Base network switching
 │   ├── remittance/
 │   │   ├── SendForm.tsx             # Transfer initiation form
-│   │   ├── AmountInput.tsx          # USDC amount with fee preview
+│   │   ├── AmountInput.tsx          # CBDC amount with fee preview
 │   │   ├── RecipientInput.tsx       # ENS / address input
 │   │   ├── CorridorSelector.tsx     # Corridor picker
 │   │   └── ConfirmDialog.tsx        # Pre-send confirmation modal
@@ -392,7 +400,7 @@ User clicks "Send"
        │
        ▼
 ┌─────────────┐     ┌──────────────────┐
-│  Frontend    │────>│ USDC.approve()    │  1. Approve Router to spend USDC
+│  Frontend    │────>│ CBDC.approve()    │  1. Approve Router to spend CBDC
 │  (wagmi)     │     │ (user signs tx)   │
 └─────────────┘     └──────────────────┘
        │
@@ -412,7 +420,7 @@ User clicks "Send"
                     └──────┬──────┘
                            ▼
                     ┌──────────────┐
-                    │  Escrow      │  4. Deposit USDC (amount - fee) into escrow
+                    │  Escrow      │  4. Deposit CBDC (amount - fee) into escrow
                     │ .deposit()   │
                     └──────────────┘
                            │

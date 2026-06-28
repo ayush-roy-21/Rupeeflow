@@ -45,7 +45,7 @@ struct Corridor {
     string sourceCountry;        // ISO 3166-1 alpha-2 (e.g., "US")
     string destCountry;          // ISO 3166-1 alpha-2 (e.g., "IN")
     bool active;                 // Whether corridor accepts transfers
-    uint256 minAmount;           // Minimum per-transfer (USDC, 6 decimals)
+    uint256 minAmount;           // Minimum per-transfer (CBDC, token decimals)
     uint256 maxAmount;           // Maximum per-transfer
     uint256 dailyLimit;          // Daily aggregate limit (all users)
     uint256 reportingThreshold;  // AML reporting threshold
@@ -59,13 +59,13 @@ struct Corridor {
 
 | Corridor | ID | Min Amount | Max Amount | Daily Limit | AML Threshold | Expiry |
 |----------|----|-----------|-----------|-------------|---------------|--------|
-| US → India | `keccak256("US-IN")` | 10 USDC | 10,000 USDC | 500,000 USDC | 3,000 USDC | 72h |
-| US → Philippines | `keccak256("US-PH")` | 10 USDC | 10,000 USDC | 500,000 USDC | 3,000 USDC | 72h |
-| US → Mexico | `keccak256("US-MX")` | 10 USDC | 10,000 USDC | 500,000 USDC | 3,000 USDC | 72h |
-| UK → India | `keccak256("UK-IN")` | 10 USDC | 8,000 USDC | 400,000 USDC | 2,500 USDC | 72h |
-| UK → Pakistan | `keccak256("UK-PK")` | 10 USDC | 8,000 USDC | 400,000 USDC | 2,500 USDC | 72h |
-| UAE → India | `keccak256("AE-IN")` | 10 USDC | 15,000 USDC | 750,000 USDC | 5,000 USDC | 48h |
-| SG → India | `keccak256("SG-IN")` | 10 USDC | 12,000 USDC | 600,000 USDC | 4,000 USDC | 48h |
+| US → India | `keccak256("US-IN")` | 10 CBDC | 10,000 CBDC | 500,000 CBDC | 3,000 CBDC | 72h |
+| US → Philippines | `keccak256("US-PH")` | 10 CBDC | 10,000 CBDC | 500,000 CBDC | 3,000 CBDC | 72h |
+| US → Mexico | `keccak256("US-MX")` | 10 CBDC | 10,000 CBDC | 500,000 CBDC | 3,000 CBDC | 72h |
+| UK → India | `keccak256("UK-IN")` | 10 CBDC | 8,000 CBDC | 400,000 CBDC | 2,500 CBDC | 72h |
+| UK → Pakistan | `keccak256("UK-PK")` | 10 CBDC | 8,000 CBDC | 400,000 CBDC | 2,500 CBDC | 72h |
+| UAE → India | `keccak256("AE-IN")` | 10 CBDC | 15,000 CBDC | 750,000 CBDC | 5,000 CBDC | 48h |
+| SG → India | `keccak256("SG-IN")` | 10 CBDC | 12,000 CBDC | 600,000 CBDC | 4,000 CBDC | 48h |
 
 ---
 
@@ -88,10 +88,10 @@ contract ConfigureCorridorScript is Script {
                 sourceCountry: "US",
                 destCountry: "IN",
                 active: true,
-                minAmount: 10e6,           // 10 USDC
-                maxAmount: 10_000e6,       // 10,000 USDC
-                dailyLimit: 500_000e6,     // 500,000 USDC
-                reportingThreshold: 3_000e6, // 3,000 USDC
+                minAmount: 10e6,           // 10 CBDC
+                maxAmount: 10_000e6,       // 10,000 CBDC
+                dailyLimit: 500_000e6,     // 500,000 CBDC
+                reportingThreshold: 3_000e6, // 3,000 CBDC
                 expiryDuration: 72 hours
             })
         );

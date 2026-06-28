@@ -16,7 +16,7 @@
   <p align="center">
     <img src="https://img.shields.io/badge/Solidity-0.8.24-blue?logo=solidity" alt="Solidity" />
     <img src="https://img.shields.io/badge/Base_L2-Mainnet-0052FF?logo=coinbase" alt="Base" />
-    <img src="https://img.shields.io/badge/USDC-Circle-2775CA?logo=circle" alt="USDC" />
+    <img src="https://img.shields.io/badge/CBDC-Multi--Currency-2775CA" alt="CBDC" />
     <img src="https://img.shields.io/badge/Foundry-Forge-orange" alt="Foundry" />
     <img src="https://img.shields.io/badge/React-18-61DAFB?logo=react" alt="React" />
     <img src="https://img.shields.io/badge/Coverage-95%25+-brightgreen" alt="Coverage" />
@@ -28,7 +28,7 @@
 
 ## Overview
 
-**RupeeFlow** is a high-throughput, EVM-based cross-border payment gateway built on the **Base L2 network** (Optimism stack). It enables near-instant, low-cost international remittances using **USDC** as the settlement currency, reducing transaction fees by **~95%** compared to traditional remittance services and achieving **sub-10-second settlement finality**.
+**RupeeFlow** is a high-throughput, EVM-based cross-border payment gateway built on the **Base L2 network** (Optimism stack). It enables near-instant, low-cost international remittances using **CBDCs (Central Bank Digital Currencies)** as the settlement layer, reducing transaction fees by **~95%** compared to traditional remittance services and achieving **sub-10-second settlement finality**.
 
 The protocol features a **trustless multi-signature escrow mechanism** built with battle-tested **OpenZeppelin** contract primitives, a real-time **on-chain AML (Anti-Money Laundering) module** that flags suspicious wallet clusters, and a complete React-based frontend for end-to-end remittance management.
 
@@ -50,7 +50,7 @@ The protocol features a **trustless multi-signature escrow mechanism** built wit
 ### 🏗️ Core Protocol
 - **Remittance Router** — Orchestrates cross-border payment flows with corridor-specific configuration (fee tiers, limits, compliance rules)
 - **Multi-Signature Escrow** — Trustless fund custody using OpenZeppelin's multi-sig patterns; funds are held in escrow until delivery confirmation
-- **USDC Settlement** — Native Circle USDC integration for stable-value transfers with zero slippage
+- **CBDC Settlement** — Multi-CBDC support (Digital Rupee, Digital Dollar, Digital Yuan, etc.) for sovereign-backed stable-value transfers with zero slippage
 - **Fee Controller** — Dynamic fee calculation engine with tiered pricing, volume discounts, and corridor-specific overrides
 
 ### 🔒 Security & Compliance
@@ -105,8 +105,8 @@ The protocol features a **trustless multi-signature escrow mechanism** built wit
 │  └──────┬──────┘ └────────────┘ └───────┬────────┘             │
 │         │                               │                       │
 │  ┌──────▼──────────────────────────────▼────────────────────┐   │
-│  │                    USDC (Circle)                          │   │
-│  │           ERC-20 on Base: 0x833589fCD6...                 │   │
+│  │              CBDC Token Registry                          │   │
+│  │     ERC-20 CBDCs (e-Rupee, e-Dollar, e-Yuan, etc.)        │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                 │
 │  ┌──────────────────────────────────────────────────────────┐   │
@@ -130,16 +130,16 @@ Sender                  Router              Escrow            AML              R
   │                       │──────────────────────────────────>│                  │
   │                       │                   │    ✅ pass      │                  │
   │                       │<──────────────────────────────────│                  │
-  │                       │  deposit(USDC)    │                │                  │
+  │                       │  deposit(CBDC)    │                │                  │
   │                       │──────────────────>│                │                  │
   │                       │                   │                │                  │
   │                       │  ── wait for delivery confirmation ──                │
   │                       │                   │                │                  │
   │                       │  confirmDelivery()│                │                  │
   │                       │<─────────────────────────────────────────────────────│
-  │                       │  release(USDC)    │                │                  │
+  │                       │  release(CBDC)    │                │                  │
   │                       │──────────────────>│                │                  │
-  │                       │                   │──── transfer USDC ──────────────>│
+  │                       │                   │──── transfer CBDC ──────────────>│
   │                       │                   │                │                  │
   │  emit TransferCompleted                   │                │                  │
   │<──────────────────────│                   │                │                  │
@@ -186,7 +186,7 @@ rupeeflow/
 │   │   │   └── EscrowMultiSig.t.sol      # Multi-sig signing flows
 │   │   ├── fork/
 │   │   │   ├── BaseFork.t.sol            # Mainnet fork tests
-│   │   │   └── USDCFork.t.sol            # Real USDC on forked Base
+│   │   │   └── CBDCFork.t.sol            # Real CBDC on forked Base
 │   │   └── invariant/
 │   │       ├── EscrowInvariant.t.sol     # Escrow balance invariants
 │   │       └── AMLInvariant.t.sol        # AML state invariants
@@ -274,7 +274,7 @@ cp .env.example .env
 # BASE_SEPOLIA_RPC_URL=https://sepolia.base.org    # Base Sepolia testnet
 # PRIVATE_KEY=0x...                                 # Deployer private key
 # BASESCAN_API_KEY=...                              # Contract verification
-# USDC_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913  # Base USDC
+# CBDC_REGISTRY=0x...                                       # CBDC Token Registry
 ```
 
 ---
@@ -368,12 +368,12 @@ forge test --match-path test/invariant/*   # Invariant/fuzz tests
 |----------|-------------|-------|
 | **Unit** | Individual contract function tests | ~60 |
 | **Integration** | Multi-contract interaction flows | ~25 |
-| **Fork** | Mainnet forking with real USDC on Base | ~15 |
+| **Fork** | Mainnet forking with real CBDC tokens on Base | ~15 |
 | **Invariant** | Stateful fuzz testing for invariants | ~10 |
 
 ### Mainnet Fork Testing
 
-Fork tests run against live Base mainnet state to validate real USDC interactions:
+Fork tests run against live Base mainnet state to validate real CBDC token interactions:
 
 ```bash
 # Run fork tests against Base mainnet
@@ -481,7 +481,7 @@ pnpm preview
 | `initiateTransfer` | ~120,000 | ~$0.03 |
 | `completeTransfer` | ~85,000 | ~$0.02 |
 | `cancelTransfer` | ~65,000 | ~$0.01 |
-| USDC `transfer` | ~55,000 | ~$0.01 |
+| CBDC `transfer` | ~55,000 | ~$0.01 |
 | **Total Round Trip** | **~325,000** | **~$0.07** |
 
 *Compared to traditional remittance fees of $15-45 per transaction.*
@@ -510,7 +510,7 @@ pnpm preview
 | Smart Contracts | Solidity 0.8.24, OpenZeppelin 5.x |
 | Development Framework | Foundry (Forge, Cast, Anvil) |
 | L2 Network | Base (Optimism stack) |
-| Stablecoin | USDC (Circle) |
+| Settlement Currency | CBDCs (Digital Rupee, Digital Dollar, etc.) |
 | Frontend | React 18, TypeScript, Vite |
 | Web3 Integration | wagmi v2, viem |
 | Wallet Support | MetaMask, Coinbase Wallet, WalletConnect |

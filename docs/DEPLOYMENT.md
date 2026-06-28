@@ -48,9 +48,9 @@ PRIVATE_KEY=0x<YOUR_DEPLOYER_PRIVATE_KEY>
 # Contract Verification
 BASESCAN_API_KEY=<YOUR_BASESCAN_API_KEY>
 
-# USDC Addresses
-USDC_BASE_MAINNET=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-USDC_BASE_SEPOLIA=0x036CbD53842c5426634e7929541eC2318f3dCF7e
+# CBDC Token Registry
+CBDC_REGISTRY=0x_YOUR_CBDC_REGISTRY_ADDRESS
+# Individual CBDC token addresses are managed via the registry
 
 # Multi-sig Signers (addresses)
 SIGNER_1=0x<ADDRESS>
@@ -75,9 +75,9 @@ Contracts must be deployed in dependency order:
 3. AMLModule              (depends on: SanctionsList)
 4. RateLimiter            (no dependencies)
 5. CorridorRegistry       (no dependencies)
-6. MultiSigEscrow         (depends on: USDC address)
+6. MultiSigEscrow         (depends on: CBDC registry address)
 7. EmergencyGuardian      (depends on: Router — set after)
-8. RemittanceRouter       (depends on: ALL above + USDC)
+8. RemittanceRouter       (depends on: ALL above + CBDC registry)
 9. Post-Deploy Config     (grant roles, register corridors)
 ```
 
@@ -132,7 +132,7 @@ cast call <ROUTER_ADDRESS> "feeController()(address)" --rpc-url $BASE_SEPOLIA_RP
 cast call <ROUTER_ADDRESS> "amlModule()(address)" --rpc-url $BASE_SEPOLIA_RPC_URL
 
 # Test a transfer on testnet
-cast send <USDC_SEPOLIA> "approve(address,uint256)" <ROUTER_ADDRESS> 1000000 \
+cast send <CBDC_TOKEN> "approve(address,uint256)" <ROUTER_ADDRESS> 1000000 \
   --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $PRIVATE_KEY
 ```
 
@@ -218,10 +218,10 @@ forge script script/ConfigureCorridor.s.sol:ConfigureCorridorScript \
 # ID: keccak256("US-IN")
 # Source: "US"
 # Dest: "IN"
-# Min Amount: 10 USDC
-# Max Amount: 10,000 USDC
-# Daily Limit: 50,000 USDC
-# Reporting Threshold: 3,000 USDC
+# Min Amount: 10 CBDC
+# Max Amount: 10,000 CBDC
+# Daily Limit: 50,000 CBDC
+# Reporting Threshold: 3,000 CBDC
 # Expiry: 72 hours
 ```
 
@@ -259,7 +259,7 @@ forge verify-contract \
   --chain base \
   --etherscan-api-key $BASESCAN_API_KEY \
   --constructor-args $(cast abi-encode "constructor(address,address,address,address,address,address)" \
-    $USDC $ESCROW $FEE_CTRL $AML $CORRIDOR $RATE_LIMITER)
+    $CBDC_REGISTRY $ESCROW $FEE_CTRL $AML $CORRIDOR $RATE_LIMITER)
 ```
 
 ---
