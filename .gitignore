@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+lib/
+
+# Build artifacts
+out/
+cache/
+artifacts/
+typechain-types/
+dist/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Foundry
+cache_forge/
+broadcast/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+lcov.info
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
